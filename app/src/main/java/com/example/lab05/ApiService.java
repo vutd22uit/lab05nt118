@@ -30,4 +30,12 @@ public interface ApiService {
             @Field("username") String username,
             @Field("password") String password
     );
+
+    @FormUrlEncoded
+    @POST("register.php")
+    Call<LoginResponse> register(
+            @Field("username") String username,
+            @Field("password") String password,
+            @Field("fullname") String fullname
+    );
 }

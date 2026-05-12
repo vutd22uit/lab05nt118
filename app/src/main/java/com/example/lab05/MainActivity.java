@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.List;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -123,19 +124,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void insertStudent(String name, int age, String studentClass) {
-        apiService.insertStudent(name, age, studentClass).enqueue(new Callback<Void>() {
+        apiService.insertStudent(name, age, studentClass).enqueue(new Callback<ResponseBody>() {
             @Override
-            public void onResponse(Call<Void> call, Response<Void> response) {
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 if (response.isSuccessful()) {
                     Toast.makeText(MainActivity.this, "Insert thành công!", Toast.LENGTH_SHORT).show();
                     getAllStudents();
                 } else {
-                    Toast.makeText(MainActivity.this, "Insert thất bại!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "Insert thất bại! Mã lỗi: " + response.code(), Toast.LENGTH_LONG).show();
                 }
             }
 
             @Override
-            public void onFailure(Call<Void> call, Throwable t) {
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
                 Toast.makeText(MainActivity.this, "Lỗi: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });

@@ -27,10 +27,8 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        // Initialize Retrofit
-        // Use 10.0.2.2 to access your computer's localhost from Android Emulator
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://10.0.2.2/lab05/") 
+                .baseUrl("http://10.0.2.2/lab05/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
@@ -46,7 +44,9 @@ public class LoginActivity extends AppCompatActivity {
             String password = etPassword.getText().toString().trim();
 
             if (username.isEmpty() || password.isEmpty()) {
-                Toast.makeText(LoginActivity.this, "Please fill all fields", Toast.LENGTH_SHORT).show();
+                Toast.makeText(LoginActivity.this,
+                        "Vui lòng nhập đầy đủ thông tin",
+                        Toast.LENGTH_SHORT).show();
             } else {
                 loginWithWebService(username, password);
             }
@@ -59,32 +59,44 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void loginWithWebService(String username, String password) {
-        // We hash the password on the client side if requested, 
-        // but often the webservice handles it. Based on Part 2, let's hash it.
+        // Fix bug: Mã hóa mật khẩu MD5 trước khi gửi lên Server để khớp với dữ liệu lúc đăng ký
         String hashedPassword = HashUtils.md5(password);
-
+        
         Call<LoginResponse> call = apiService.login(username, hashedPassword);
+
         call.enqueue(new Callback<LoginResponse>() {
             @Override
             public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     LoginResponse loginResponse = response.body();
+
                     if (loginResponse.isSuccess()) {
-                        Toast.makeText(LoginActivity.this, "Login Successful: " + loginResponse.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LoginActivity.this,
+                                "Đăng nhập thành công",
+                                Toast.LENGTH_SHORT).show();
+
                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                         startActivity(intent);
                         finish();
+
                     } else {
-                        Toast.makeText(LoginActivity.this, "Login Failed: " + loginResponse.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LoginActivity.this,
+                                "Thất bại: " + loginResponse.getMessage(),
+                                Toast.LENGTH_SHORT).show();
                     }
+
                 } else {
-                    Toast.makeText(LoginActivity.this, "Server Error: " + response.code(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LoginActivity.this,
+                            "Lỗi Server: " + response.code(),
+                            Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<LoginResponse> call, Throwable t) {
-                Toast.makeText(LoginActivity.this, "Network Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(LoginActivity.this,
+                        "Lỗi kết nối: " + t.getMessage(),
+                        Toast.LENGTH_LONG).show();
             }
         });
     }
